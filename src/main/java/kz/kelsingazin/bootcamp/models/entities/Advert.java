@@ -1,21 +1,25 @@
 package kz.kelsingazin.bootcamp.models.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import kz.kelsingazin.bootcamp.models.audits.AuditModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
-@Data
+import java.util.Date;
+
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "adverts")
 public class Advert extends AuditModel {
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "ended_at", nullable = false, updatable = false)
+    @CreatedDate
+    private Date endedAt;
 
     @ManyToOne
     private User sellerId;
