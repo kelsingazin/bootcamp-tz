@@ -1,5 +1,6 @@
 package kz.kelsingazin.bootcamp.services.impl;
 
+import jakarta.transaction.Transactional;
 import kz.kelsingazin.bootcamp.exceptions.ServiceException;
 import kz.kelsingazin.bootcamp.models.entities.Advert;
 import kz.kelsingazin.bootcamp.models.entities.Product;
@@ -33,19 +34,20 @@ public class AdvertServiceImpl implements AdvertService {
     }
 
     @Override
+    @Transactional
     public Advert bet(Long advertId, Long productId, Long userId, Double price) {
         User user = userService.getActiveUserById(userId);
         Product product = productService.getActiveProductById(productId);
-        if(price<= product.getPrice()){
+        if (price <= product.getPrice()) {
             throw ServiceException.builder()
                     .errorCode(ErrorCode.PRODUCT_NOT_FOUND)
                     .message("Ставка должна быть больше текушей")
                     .build();
-        }else {
+        } else {
             product.setPrice(price);
         }
         Advert advert = findActiveAdvert(advertId);
-        if(advert.getEndedAt().before(new Date())){
+        if (advert.getEndedAt().before(new Date())) {
             log.info("Auction is over!");
             log.info("Send email to buyer -> " + advert.getBuyerId());
             log.info("Send email to seller -> " + advert.getSellerId());
@@ -63,8 +65,8 @@ public class AdvertServiceImpl implements AdvertService {
     private Advert findActiveAdvert(Long id) {
         return advertRepository.findAdvertByIdAndDeletedAtNull(id)
                 .orElseThrow(() -> ServiceException.builder()
-                .errorCode(ErrorCode.ALREADY_EXISTS)
-                .message("Продукт уже есть")
-                .build());
+                        .errorCode(ErrorCode.ALREADY_EXISTS)
+                        .message("Продукт уже есть")
+                        .build());
     }
 }
